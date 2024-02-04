@@ -57,13 +57,19 @@ function dishExists(req, res, next) {
 
 
 //Get request to retrieve a sinlge dish 
-function read(req, res) {
-    res.json({ data: res.locals.dish });
+function read(req, res, next) {
+  const { dishId } = req.params;
+  const foundDish = dishes.find((dish) => dish.id === dishId);
+  if (foundDish) {
+    return res.json({ data: foundDish });
+  }
+  next({ status: 404, message: `Dish id not found: ${dishId}` });
 }
 
 
+
 // PUT request to update an existing dish 
-function update(req, res) {
+function update(req, res, next) {
     const dish = res.locals.dish;
     const { data: { id, name, description, price, image_url } = {} } = req.body;
 
