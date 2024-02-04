@@ -43,9 +43,9 @@ function create(req, res) {
 
 
 
-function DishExists(req, res, next) {
+function dishExists(req, res, next) {
     const { dishId } = req.params;
-    const foundDish = dish.find((dish) => dish.id === dishId);
+    const foundDish = dishes.find((dish) => dish.id === dishId);
 
     if (foundDish) {
         res.locals.dish = foundDish;
@@ -65,7 +65,7 @@ function read(req, res) {
 // PUT request to update an existing dish 
 function update(req, res) {
     const dish = res.locals.dish;
-    const { data: { id, name, description, price, image_url } = {} } = res.body;
+    const { data: { id, name, description, price, image_url } = {} } = req.body;
 
     //Validation: if ID is provided in the body, it must match the DishID in the route
     if (id && id !== dish.id) {
