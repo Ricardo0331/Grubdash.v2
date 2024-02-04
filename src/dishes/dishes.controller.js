@@ -41,8 +41,62 @@ function create(req, res) {
   res.status(201).json({ data: newDish });
 }
 
-module.exports = {
-  list,
-  create,
-  validateDish, 
-};
+
+
+function DishExists(req, res, next) {
+    const { dishId } = req.params;
+    const foundDish = dish.find((dish) => dish.id === dishId);
+
+    if (foundDish) {
+        res.locals.dish = foundDish;
+        return next();
+    }
+
+    next({ status: 404, message: `Dish does not exist: ${dishId}.` });
+}
+
+
+//Get request to retrieve a sinlge dish 
+function read(req, res) {
+    res.json({ data: res.locals.dish });
+}
+
+
+// PUT request to update an existing dish 
+function update(req, res) {
+    const dish = res.locals.dish;
+    const { data: { id, name, description, price, image_url } = {} } = res.body;
+
+    //Validation: if ID is provided in the body, it must match the DishID in the route
+    if (id && id !== dish.id) {
+        return next({ status: 400, message: `Dish id does not match route id. Dish: ${id}, Route: ${dish.id}` });
+    }
+
+
+    //update dish properties
+    dish.name = name;
+    dish.description = description;
+    dish.price = price; 
+    dish.image_url = image_url;
+
+    res.json({ data: dish });
+}
+
+// Handler for disallowed methods
+function methodNotAllowed(req, res, next) {
+    next({ status: 405, message: `Method not allowed: ${req.method}` });
+  }
+  
+
+
+
+  module.exports = {
+    list,
+    create,
+    read,
+    update,
+    validateDish,
+    dishExists,
+    methodNotAllowed,
+  };
+  
